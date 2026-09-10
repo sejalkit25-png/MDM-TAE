@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Food Haven | Royal Indian Kitchen & Tandoor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Rozha+One&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            royal: ['"Rozha One"', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen text-amber-50 font-sans relative antialiased selection:bg-amber-500 selection:text-black bg-stone-950">
+  <div class="fixed inset-0 z-0 pointer-events-none">
+    <img 
+      src="https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=2000&q=85" 
+      alt="Indian Culinary Spices & Kitchen" 
+      class="w-full h-full object-cover object-center filter brightness-[0.45] contrast-[1.2] saturate-[1.3]"
+    >
+    <div class="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/60 to-black/35"></div>
+  </div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col min-h-screen">
+    <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-amber-500/25">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-xs uppercase tracking-widest text-amber-400 font-semibold">Tandoor Is Fired & Ready</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <h1 class="font-royal text-3xl sm:text-5xl text-amber-400 tracking-wide drop-shadow-md">THE FOOD HAVEN</h1>
+          <span class="text-[10px] uppercase font-bold tracking-widest bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded">Awadhi & Mughlai</span>
+        </div>
+        <p class="text-xs sm:text-sm text-stone-300 mt-1">Authentic Charcoal Tandoor, Handi Dum Biryani & Desi Ghee Curries</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="bg-stone-900/90 border border-amber-500/30 backdrop-blur-md rounded-xl p-1.5 flex text-xs">
+          <button id="mode-dinein" onclick="setDiningMode('dine-in')" class="px-3.5 py-1.5 rounded-lg font-bold transition-all bg-amber-500 text-stone-950 shadow-md shadow-amber-500/30">Dine-In</button>
+          <button id="mode-takeaway" onclick="setDiningMode('takeaway')" class="px-3.5 py-1.5 rounded-lg font-medium text-stone-400 hover:text-amber-200 transition-all">Parcel</button>
+        </div>
+        <button onclick="document.getElementById('order-section').scrollIntoView({behavior:'smooth'})" class="lg:hidden bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-lg shadow-amber-500/30">
+          <span>Thali</span>
+          <span id="mobile-cart-count" class="bg-stone-950 text-amber-400 rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold">0</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-8 my-8 items-start flex-grow">
+      <section class="lg:col-span-8 space-y-6">
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" id="categories-bar"></div>
+
+        <div class="flex items-center justify-between text-xs text-stone-300 px-1">
+          <span id="items-count-label" class="font-medium">Showing delicacies</span>
+          <div class="flex items-center gap-3 font-semibold text-[11px]">
+            <span class="inline-flex items-center gap-1 border border-emerald-500/60 bg-emerald-950/60 px-2 py-0.5 rounded text-emerald-300">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Pure Veg
+            </span>
+            <span class="inline-flex items-center gap-1 border border-rose-500/60 bg-rose-950/60 px-2 py-0.5 rounded text-rose-300">
+              <span class="w-2 h-2 rounded-full bg-rose-400"></span> Non-Veg
+            </span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="menu-grid"></div>
+      </section>
+
+      <section id="order-section" class="lg:col-span-4 lg:sticky lg:top-6">
+        <div class="bg-stone-900/90 backdrop-blur-xl border border-amber-500/30 rounded-2xl p-5 shadow-2xl space-y-5">
+          <div class="flex items-center justify-between pb-3 border-b border-amber-500/20">
+            <div>
+              <h2 class="font-royal text-2xl text-amber-400">Rasoi Bill Desk</h2>
+              <p class="text-[11px] text-stone-300" id="dining-status-text">Table #07 (Dine-in Service)</p>
+            </div>
+            <button onclick="clearCart()" class="text-xs text-stone-400 hover:text-rose-400 transition-colors font-medium">Clear Thali</button>
+          </div>
+
+          <div id="cart-items" class="space-y-3 max-h-[290px] overflow-y-auto pr-1"></div>
+
+          <div id="cart-empty-state" class="py-10 text-center space-y-2">
+            <div class="w-14 h-14 mx-auto rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-2xl">&#127858;</div>
+            <p class="text-sm font-semibold text-amber-200">Your Thali is empty</p>
+            <p class="text-xs text-stone-400 max-w-[220px] mx-auto">Add royal kebabs, curries, biryanis or desserts to calculate your bill.</p>
+          </div>
+
+          <div id="bill-breakdown" class="space-y-3 pt-3 border-t border-amber-500/20 hidden text-xs">
+            <div class="space-y-1.5 text-stone-300">
+              <div class="flex justify-between">
+                <span>Items Subtotal</span>
+                <span class="text-amber-100 font-semibold" id="subtotal-amount">₹0.00</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Restaurant GST (5%)</span>
+                <span class="text-amber-100 font-semibold" id="tax-amount">₹0.00</span>
+              </div>
+              <div class="flex justify-between text-emerald-400 hidden" id="discount-row">
+                <span>Desi Discount (<span id="discount-percent">0%</span>)</span>
+                <span id="discount-amount">-₹0.00</span>
+              </div>
+              <div class="flex justify-between" id="tip-row">
+                <span>Staff Gratuity / Shagun</span>
+                <span class="text-amber-100 font-semibold" id="tip-amount">₹0.00</span>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1.5 text-stone-300 text-[11px]">
+                <span>Add Shagun (Staff Tip)</span>
+                <span id="tip-chosen-label" class="text-amber-400 font-bold">₹30</span>
+              </div>
+              <div class="grid grid-cols-4 gap-1.5 font-semibold">
+                <button onclick="setTip(0)" class="tip-btn py-1 rounded-lg bg-stone-800 border border-stone-700 text-stone-300 hover:border-amber-400">₹0</button>
+                <button onclick="setTip(30)" class="tip-btn py-1 rounded-lg bg-amber-500 text-stone-950 border border-amber-400 shadow">₹30</button>
+                <button onclick="setTip(50)" class="tip-btn py-1 rounded-lg bg-stone-800 border border-stone-700 text-stone-300 hover:border-amber-400">₹50</button>
+                <button onclick="setTip(100)" class="tip-btn py-1 rounded-lg bg-stone-800 border border-stone-700 text-stone-300 hover:border-amber-400">₹100</button>
+              </div>
+            </div>
+
+            <div class="flex gap-2">
+              <input id="coupon-input" type="text" placeholder="Coupon Code (ZAIKA10)" class="w-full bg-stone-950/80 border border-amber-500/30 rounded-lg px-2.5 py-1.5 text-xs uppercase tracking-wider text-amber-200 placeholder-stone-500 focus:outline-none focus:border-amber-400">
+              <button onclick="applyCoupon()" class="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500 hover:text-stone-950 border border-amber-500/40 text-amber-300 rounded-lg text-xs font-bold transition-all whitespace-nowrap">Apply</button>
+            </div>
+            <p id="coupon-msg" class="text-[10px] hidden"></p>
+
+            <div class="pt-3 border-t border-amber-500/25 flex items-baseline justify-between text-base font-bold text-white">
+              <span>Final Payable</span>
+              <span class="text-amber-400 font-royal text-2xl tracking-wide" id="grand-total">₹0.00</span>
+            </div>
+
+            <button onclick="checkout()" class="w-full py-3 px-4 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-stone-950 font-bold rounded-xl shadow-lg shadow-amber-500/30 transition-all text-sm flex items-center justify-center gap-2">
+              <span>Send Order to Tandoor</span>
+              <span>&rarr;</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="mt-auto py-6 border-t border-amber-500/20 text-center text-xs text-stone-400 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>&copy; 2026 The Food Haven. All rights reserved.</p>
+      <p class="text-amber-400/80">Desi Ghee Delicacies &bull; Clay Charcoal Tandoor &bull; Mughlai Heritage</p>
+    </footer>
+  </div>
+
+  <div id="modal-backdrop" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+    <div class="bg-stone-900 border border-amber-500/40 rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center space-y-4">
+      <div class="w-14 h-14 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-full flex items-center justify-center text-2xl mx-auto">&#10003;</div>
+      <div>
+        <h3 class="font-royal text-2xl text-amber-400">Order Sent to Rasoi!</h3>
+        <p class="text-xs text-stone-300 mt-1" id="order-modal-details">Bawarchi has begun heating the handi & tandoor.</p>
+      </div>
+      <div class="bg-stone-950/80 border border-amber-500/20 rounded-xl p-3 text-left text-xs space-y-1.5 text-stone-200" id="receipt-snippet"></div>
+      <button onclick="closeModal()" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold rounded-xl text-xs shadow-lg shadow-amber-500/20">Thank You</button>
+    </div>
+  </div>
+
+  <div id="toast" class="fixed bottom-5 right-5 bg-stone-900 border border-amber-500/40 text-amber-100 text-xs px-4 py-2.5 rounded-xl shadow-2xl z-50 transform translate-y-16 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-2">
+    <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+    <span id="toast-text"></span>
+  </div>
+
+  <script>
+    const MENU_DATA = [
+      { id: 1, name: "Paneer Tikka Angara", category: "starters", price: 290, veg: true, tag: "Tandoor Hit", desc: "Smoky malai paneer cubes marinated in Degi mirch, hung curd, and roasted mustard oil.", image: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=600&q=80" },
+      { id: 2, name: "Murgh Malai Tikka", category: "starters", price: 360, veg: false, tag: "Chef Special", desc: "Melt-in-mouth chicken chunks steeped in cashew cream, green cardamom and royal spices.", image: "https://upload.wikimedia.org/wikipedia/commons/b/bd/Tandoorimumbai.jpg" },
+      { id: 3, name: "Lucknowi Dahi Kebab", category: "starters", price: 260, veg: true, tag: "Crispy", desc: "Golden crusted spiced hung yogurt patties with fresh mint chutney dip.", image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=600&q=80" },
+      { id: 4, name: "Purani Dilli Butter Chicken", category: "curries", price: 420, veg: false, tag: "Bestseller", desc: "Clay-roasted tandoori chicken simmered in rich satin tomato gravy, butter and kasuri methi.", image: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?auto=format&fit=crop&w=600&q=80" },
+      { id: 5, name: "Dal Makhani Bukhara", category: "curries", price: 320, veg: true, tag: "Slow Cooked", desc: "Black lentils slow simmered overnight over clay coals, enriched with white butter & cream.", image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=600&q=80" },
+      { id: 6, name: "Shahi Paneer Lababdar", category: "curries", price: 340, veg: true, tag: "Royal Gravy", desc: "Fresh cottage cheese in mildly spiced onion-tomato magma with grated paneer and cream.", image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=600&q=80" },
+      { id: 7, name: "Hyderabadi Dum Mutton Biryani", category: "biryani", price: 480, veg: false, tag: "Dum Pukht", desc: "Kachi yakhni long-grain basmati rice, tender goat meat sealed with dough and saffron steam.", image: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80" },
+      { id: 8, name: "Tandoori Garlic Butter Naan", category: "biryani", price: 75, veg: true, tag: "Crisp", desc: "Fresh leavened bread slathered with roasted garlic cloves, cilantro, and desi ghee.", image: "https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?auto=format&fit=crop&w=600&q=80" },
+      { id: 9, name: "Kesariya Shahi Gulab Jamun", category: "desserts", price: 160, veg: true, tag: "Desi Ghee", desc: "Golden mawa spheres soaked in green cardamom syrup, crowned with rabdi and pistachio.", image: "https://upload.wikimedia.org/wikipedia/commons/c/c1/Gulab-jamun-wallpaper-1.jpg" },
+      { id: 10, name: "Alphonso Mango Lassi", category: "drinks", price: 120, veg: true, tag: "Refreshing", desc: "Chilled hand-churned yogurt blended with Ratnagiri alphonso pulp and saffron threads.", image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80" },
+      { id: 11, name: "Kullad Masala Chai", category: "drinks", price: 70, veg: true, tag: "Aromatic", desc: "Brewed Assam leaves infused with freshly crushed ginger, clove, cinnamon in baked clay cup.", image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80" }
+    ];
+
+    const CATEGORIES = [
+      { id: "all", label: "All Delicacies" },
+      { id: "starters", label: "Tandoor & Starters" },
+      { id: "curries", label: "Royal Curries" },
+      { id: "biryani", label: "Biryani & Breads" },
+      { id: "desserts", label: "Mithai" },
+      { id: "drinks", label: "Beverages" }
+    ];
+
+    let currentCategory = "all";
+    let cart = {};
+    let diningMode = "dine-in";
+    let tipAmount = 30;
+    let discountPercent = 0;
+    let toastTimer;
+
+    function init() {
+      renderCategories();
+      renderMenu();
+      updateCartDisplay();
+    }
+
+    function renderCategories() {
+      const container = document.getElementById("categories-bar");
+      container.innerHTML = CATEGORIES.map(cat => `
+        <button onclick="setCategory('${cat.id}')" class="px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border ${
+          currentCategory === cat.id 
+            ? 'bg-amber-500 text-stone-950 border-amber-400 font-bold shadow-md shadow-amber-500/30' 
+            : 'bg-stone-900/90 text-stone-300 border-amber-500/20 hover:border-amber-400 hover:text-white'
+        }">${cat.label}</button>
+      `).join("");
+    }
+
+    function setCategory(id) {
+      currentCategory = id;
+      renderCategories();
+      renderMenu();
+    }
+
+    function setDiningMode(mode) {
+      diningMode = mode;
+      const dineInBtn = document.getElementById("mode-dinein");
+      const takeawayBtn = document.getElementById("mode-takeaway");
+      const statusText = document.getElementById("dining-status-text");
+
+      if (mode === "dine-in") {
+        dineInBtn.className = "px-3.5 py-1.5 rounded-lg font-bold transition-all bg-amber-500 text-stone-950 shadow-md shadow-amber-500/30";
+        takeawayBtn.className = "px-3.5 py-1.5 rounded-lg font-medium text-stone-400 hover:text-amber-200 transition-all";
+        statusText.textContent = "Table #07 (Dine-in Service)";
+      } else {
+        takeawayBtn.className = "px-3.5 py-1.5 rounded-lg font-bold transition-all bg-amber-500 text-stone-950 shadow-md shadow-amber-500/30";
+        dineInBtn.className = "px-3.5 py-1.5 rounded-lg font-medium text-stone-400 hover:text-amber-200 transition-all";
+        statusText.textContent = "Takeaway Parcel Desk";
+      }
+      showToast(`Switched to ${mode === 'dine-in' ? 'Dine-In' : 'Parcel / Takeaway'}`);
+    }
+
+    function renderMenu() {
+      const filtered = currentCategory === "all" ? MENU_DATA : MENU_DATA.filter(item => item.category === currentCategory);
+      document.getElementById("items-count-label").textContent = `Showing ${filtered.length} delicacies`;
+
+      document.getElementById("menu-grid").innerHTML = filtered.map(item => {
+        const qty = cart[item.id] || 0;
+        return `
+          <div class="group bg-stone-900/85 hover:bg-stone-900 border border-amber-500/20 hover:border-amber-400/60 backdrop-blur-md rounded-2xl overflow-hidden transition-all duration-300 flex flex-col justify-between shadow-xl">
+            <div class="relative h-44 overflow-hidden">
+              <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-95 contrast-105">
+              <div class="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-black/30"></div>
+              <div class="absolute top-3 left-3 flex items-center gap-1.5 bg-stone-950/80 backdrop-blur-md px-2.5 py-1 rounded-md border ${item.veg ? 'border-emerald-500/60 text-emerald-300' : 'border-rose-500/60 text-rose-300'} text-[10px] font-bold">
+                <span class="w-2 h-2 rounded-full ${item.veg ? 'bg-emerald-400' : 'bg-rose-500'}"></span>
+                <span>${item.veg ? 'PURE VEG' : 'NON-VEG'}</span>
+              </div>
+              ${item.tag ? `<div class="absolute top-3 right-3 bg-amber-500 text-stone-950 text-[10px] font-extrabold px-2 py-0.5 rounded shadow-md">${item.tag}</div>` : ''}
+              <div class="absolute bottom-2.5 left-3 text-amber-300 font-royal text-xl font-bold">₹${item.price}</div>
+            </div>
+            <div class="p-4 flex flex-col justify-between flex-grow space-y-3">
+              <div>
+                <h3 class="font-bold text-stone-100 text-base leading-snug group-hover:text-amber-300 transition-colors">${item.name}</h3>
+                <p class="text-xs text-stone-300 mt-1 leading-relaxed line-clamp-2">${item.desc}</p>
+              </div>
+              <div class="pt-2 flex items-center justify-between border-t border-stone-800">
+                <span class="text-[11px] text-amber-400/80 uppercase tracking-wider font-bold">${item.category}</span>
+                ${qty > 0 ? `
+                  <div class="flex items-center bg-stone-800 border border-amber-500/30 rounded-xl overflow-hidden p-0.5">
+                    <button onclick="updateQuantity(${item.id}, -1)" class="w-7 h-7 flex items-center justify-center text-stone-300 hover:bg-stone-700 rounded-lg text-sm font-bold active:scale-95 transition-all">-</button>
+                    <span class="w-8 text-center text-xs font-bold text-amber-400">${qty}</span>
+                    <button onclick="updateQuantity(${item.id}, 1)" class="w-7 h-7 flex items-center justify-center text-stone-300 hover:bg-stone-700 rounded-lg text-sm font-bold active:scale-95 transition-all">+</button>
+                  </div>
+                ` : `
+                  <button onclick="updateQuantity(${item.id}, 1)" class="bg-stone-800 hover:bg-amber-500 hover:text-stone-950 text-amber-300 text-xs font-bold px-3 py-1.5 rounded-xl border border-amber-500/30 transition-all flex items-center gap-1">
+                    <span>+ Add to Thali</span>
+                  </button>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function updateQuantity(itemId, delta) {
+      const next = (cart[itemId] || 0) + delta;
+      if (next <= 0) delete cart[itemId];
+      else cart[itemId] = next;
+
+      renderMenu();
+      updateCartDisplay();
+
+      const item = MENU_DATA.find(i => i.id === itemId);
+      if (delta > 0 && item) showToast(`Added ${item.name} to Thali`);
+    }
+
+    function updateCartDisplay() {
+      const cartContainer = document.getElementById("cart-items");
+      const emptyState = document.getElementById("cart-empty-state");
+      const billBreakdown = document.getElementById("bill-breakdown");
+      const mobileCount = document.getElementById("mobile-cart-count");
+
+      const itemIds = Object.keys(cart);
+      mobileCount.textContent = itemIds.reduce((sum, id) => sum + cart[id], 0);
+
+      if (itemIds.length === 0) {
+        cartContainer.innerHTML = "";
+        emptyState.classList.remove("hidden");
+        billBreakdown.classList.add("hidden");
+        return;
+      }
+
+      emptyState.classList.add("hidden");
+      billBreakdown.classList.remove("hidden");
+
+      let subtotal = 0;
+      cartContainer.innerHTML = itemIds.map(id => {
+        const item = MENU_DATA.find(i => i.id === Number(id));
+        const count = cart[id];
+        const lineTotal = item.price * count;
+        subtotal += lineTotal;
+
+        return `
+          <div class="flex items-center justify-between gap-3 bg-stone-950/60 p-2.5 rounded-xl border border-stone-800">
+            <div class="flex-grow min-w-0">
+              <p class="text-xs font-semibold text-stone-200 truncate">${item.name}</p>
+              <p class="text-[10px] text-stone-400">₹${item.price} each</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="flex items-center bg-stone-800 rounded-lg p-0.5">
+                <button onclick="updateQuantity(${item.id}, -1)" class="w-5 h-5 flex items-center justify-center text-xs text-stone-400 hover:text-white">-</button>
+                <span class="w-5 text-center text-xs font-bold text-amber-300">${count}</span>
+                <button onclick="updateQuantity(${item.id}, 1)" class="w-5 h-5 flex items-center justify-center text-xs text-stone-400 hover:text-white">+</button>
+              </div>
+              <span class="text-xs font-bold text-amber-400 min-w-[55px] text-right">₹${lineTotal}</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      const tax = Math.round(subtotal * 0.05);
+      const discount = Math.round(subtotal * (discountPercent / 100));
+      const grandTotal = Math.max(0, subtotal - discount + tax + tipAmount);
+
+      document.getElementById("subtotal-amount").textContent = `₹${subtotal}`;
+      document.getElementById("tax-amount").textContent = `₹${tax}`;
+      document.getElementById("tip-amount").textContent = `₹${tipAmount}`;
+      document.getElementById("grand-total").textContent = `₹${grandTotal}`;
+
+      const discountRow = document.getElementById("discount-row");
+      if (discountPercent > 0) {
+        discountRow.classList.remove("hidden");
+        document.getElementById("discount-percent").textContent = `${discountPercent}%`;
+        document.getElementById("discount-amount").textContent = `-₹${discount}`;
+      } else {
+        discountRow.classList.add("hidden");
+      }
+    }
+
+    function setTip(val) {
+      tipAmount = val;
+      document.getElementById("tip-chosen-label").textContent = `₹${val}`;
+      document.querySelectorAll(".tip-btn").forEach(btn => {
+        btn.className = parseInt(btn.textContent.replace('₹', '')) === val 
+          ? "tip-btn py-1 rounded-lg bg-amber-500 text-stone-950 font-bold border border-amber-400 shadow" 
+          : "tip-btn py-1 rounded-lg bg-stone-800 border border-stone-700 text-stone-300 hover:border-amber-400";
+      });
+      updateCartDisplay();
+    }
+
+    function applyCoupon() {
+      const code = document.getElementById("coupon-input").value.trim().toUpperCase();
+      const msg = document.getElementById("coupon-msg");
+
+      if (code === "ZAIKA10") {
+        discountPercent = 10;
+        msg.textContent = "Shubh Code ZAIKA10 applied (10% OFF)";
+        msg.className = "text-[10px] text-emerald-400 block";
+        showToast("10% Desi Discount Applied");
+      } else if (code === "ROYAL20") {
+        discountPercent = 20;
+        msg.textContent = "Mughlai Feast code ROYAL20 applied (20% OFF)";
+        msg.className = "text-[10px] text-emerald-400 block";
+        showToast("20% Royal Discount Applied");
+      } else {
+        discountPercent = 0;
+        msg.textContent = "Invalid code. Try ZAIKA10 or ROYAL20";
+        msg.className = "text-[10px] text-rose-400 block";
+      }
+      updateCartDisplay();
+    }
+
+    function clearCart() {
+      cart = {};
+      discountPercent = 0;
+      document.getElementById("coupon-input").value = "";
+      document.getElementById("coupon-msg").classList.add("hidden");
+      renderMenu();
+      updateCartDisplay();
+      showToast("Thali reset");
+    }
+
+    function checkout() {
+      if (Object.keys(cart).length === 0) return;
+      const grandTotal = document.getElementById("grand-total").textContent;
+      const details = document.getElementById("order-modal-details");
+      const snippet = document.getElementById("receipt-snippet");
+
+      details.textContent = diningMode === "dine-in" 
+        ? "Serving hot at Table #07. Bawarchi is preparing the charcoal tandoor." 
+        : "Order queued for Parcel Counter collection (approx 20 mins).";
+
+      const lines = Object.keys(cart).map(id => {
+        const item = MENU_DATA.find(i => i.id === Number(id));
+        return `<div class="flex justify-between"><span>${cart[id]}x ${item.name}</span><span class="font-bold text-amber-300">₹${item.price * cart[id]}</span></div>`;
+      }).join("");
+
+      snippet.innerHTML = `${lines}<div class="pt-2 mt-2 border-t border-amber-500/20 flex justify-between font-bold text-white"><span>Total Billed Amount</span><span class="text-amber-400 font-royal text-base">${grandTotal}</span></div>`;
+
+      const modal = document.getElementById("modal-backdrop");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function closeModal() {
+      const modal = document.getElementById("modal-backdrop");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      clearCart();
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toast-text").textContent = text;
+      toast.classList.remove("translate-y-16", "opacity-0");
+      toast.classList.add("translate-y-0", "opacity-100");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toast.classList.add("translate-y-16", "opacity-0");
+        toast.classList.remove("translate-y-0", "opacity-100");
+      }, 2200);
+    }
+
+    window.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
